@@ -4,7 +4,7 @@ namespace Admin.NET.Application.Entity;
 /// <summary>
 /// 
 /// </summary>
-[SugarTable("Plant","")]
+[SugarTable("Plant","工厂")]
 public class Plant  : EntityBaseData
 {
     /// <summary>
