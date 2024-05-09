@@ -46,7 +46,7 @@ public class Process : EntityTenant
     /// 单价
     /// </summary>
     [SugarColumn(ColumnName = "UnitPrice", ColumnDescription = "单价")]
-    public decimal UnitPrice { get; set; }
+    public decimal? UnitPrice { get; set; }
 
 
     /// <summary>

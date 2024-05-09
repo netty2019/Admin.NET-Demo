@@ -27,17 +27,17 @@ public class ProcessBaseInput
     /// <summary>
     /// 单价
     /// </summary>
-    public virtual decimal UnitPrice { get; set; }
+    public virtual decimal? UnitPrice { get; set; }
 
     /// <summary>
-    /// 作业者
+    /// 作业者Id
     /// </summary>
-    public virtual List<ProcessWorkerInput> Workers { get; set; }
+    public virtual long[] WorkerIds { get; set; }
 
     /// <summary>
-    /// 不良项目
+    /// 不良项目Id
     /// </summary>
-    public virtual List<ProcessNgItemInput> NgItems { get; set; }
+    public virtual long[] NgItemIds { get; set; }
 
     /// <summary>
     /// 报工比例
@@ -135,11 +135,6 @@ public class AddProcessInput : ProcessBaseInput
     [Required(ErrorMessage = "计价方式不能为空")]
     public override long PriceMethod { get; set; }
 
-    /// <summary>
-    /// 单价
-    /// </summary>
-    [Required(ErrorMessage = "单价不能为空")]
-    public override decimal UnitPrice { get; set; }
 
     /// <summary>
     /// 报工比例
@@ -182,27 +177,3 @@ public class AddProcessInput : ProcessBaseInput
     {
 
     }
-
-
-/// <summary>
-/// 工序作业者输入参数
-/// </summary>
-public class ProcessWorkerInput
-{
-    /// <summary>
-    /// 作业者用户Id
-    /// </summary>
-    public long UserId { get; set; }
-}
-
-
-/// <summary>
-/// 工序不良项目输入参数
-/// </summary>
-public class ProcessNgItemInput
-{
-    /// <summary>
-    /// 不良项目Id
-    /// </summary>
-    public long NgItemId { get; set; }
-}

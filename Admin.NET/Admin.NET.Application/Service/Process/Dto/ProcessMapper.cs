@@ -19,7 +19,11 @@ public class ProcessMapper : IRegister
     public void Register(TypeAdapterConfig config)
     {
         config.ForType<Process, ProcessOutput>()
-         .Map(t => t.Workers, o => string.Join(",",o.Workers.Select(p=>p.User.RealName)))
+         .Map(t => t.Workers, o => string.Join(",", o.Workers.Select(p => p.User.RealName)))
          .Map(t => t.NgItems, o => string.Join(",", o.NgItems.Select(p => p.NgItem.Name)));
+
+        config.ForType<Process, ProcessDto>()
+          .Map(t => t.WorkerIds, o => o.Workers.Select(p => p.UserId).ToArray())
+          .Map(t => t.NgItemIds, o =>o.NgItems.Select(p => p.NgItemId).ToArray());
     }
 }

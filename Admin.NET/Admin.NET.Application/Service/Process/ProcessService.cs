@@ -1,6 +1,7 @@
 ﻿using Admin.NET.Core.Service;
 using Admin.NET.Application.Entity;
 using Microsoft.AspNetCore.Http;
+using Mapster;
 namespace Admin.NET.Application;
 /// <summary>
 /// 工序服务
@@ -31,8 +32,9 @@ public class ProcessService : IDynamicApiController, ITransient
             .WhereIF(!string.IsNullOrWhiteSpace(input.Code), u => u.Code.Contains(input.Code.Trim()))
             .WhereIF(!string.IsNullOrWhiteSpace(input.Name), u => u.Name.Contains(input.Name.Trim()))
             .WhereIF(input.PriceMethod>0, u => u.PriceMethod == input.PriceMethod)
-            .Select<ProcessOutput>();
-        return await query.OrderBuilder(input).ToPagedListAsync(input.Page, input.PageSize);
+            .Select<Process>();
+        var result= await query.OrderBuilder(input).ToPagedListAsync(input.Page, input.PageSize);
+        return result.Adapt<SqlSugarPagedList<ProcessOutput>>();
     }
 
     /// <summary>
@@ -46,6 +48,8 @@ public class ProcessService : IDynamicApiController, ITransient
     {
         await UniqueCheck(input.Code);
         var entity = input.Adapt<Process>();
+        entity.Workers = input.WorkerIds?.Select(p => new ProcessWorker { UserId = p }).ToList()?? new List<ProcessWorker>();
+        entity.NgItems = input.NgItemIds?.Select(p => new ProcessNgItem { NgItemId = p }).ToList() ?? new List<ProcessNgItem>();
         await _rep.AsSugarClient().InsertNav(entity).Include(p => p.Workers).Include(p => p.NgItems).ExecuteCommandAsync();
         return entity.Id;
     }
@@ -75,6 +79,8 @@ public class ProcessService : IDynamicApiController, ITransient
     {
         await UniqueCheck(input.Code,input.Id);
         var entity = input.Adapt<Process>();
+        entity.Workers = input.WorkerIds?.Select(p => new ProcessWorker { UserId = p }).ToList() ?? new List<ProcessWorker>();
+        entity.NgItems = input.NgItemIds?.Select(p => new ProcessNgItem { NgItemId = p }).ToList() ?? new List<ProcessNgItem>();
         await _rep.AsSugarClient().UpdateNav(entity).Include(p=>p.Workers).Include(p=>p.NgItems).ExecuteCommandAsync();
     }
 
@@ -85,9 +91,10 @@ public class ProcessService : IDynamicApiController, ITransient
     /// <returns></returns>
     [HttpGet]
     [ApiDescriptionSettings(Name = "Detail")]
-    public async Task<Process> Detail([FromQuery] QueryByIdProcessInput input)
+    public async Task<ProcessDto> Detail([FromQuery] QueryByIdProcessInput input)
     {
-        return await _rep.GetFirstAsync(u => u.Id == input.Id);
+        var entity = await _rep.AsQueryable().Includes(p => p.Workers).Includes(p => p.NgItems).FirstAsync(u => u.Id == input.Id);
+        return entity?.Adapt<ProcessDto>();
     }
 
     /// <summary>

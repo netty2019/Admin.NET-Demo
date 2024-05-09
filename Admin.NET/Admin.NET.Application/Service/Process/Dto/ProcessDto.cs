@@ -33,15 +33,14 @@ public class ProcessDto
     public decimal UnitPrice { get; set; }
 
     /// <summary>
-    /// 作业者
+    /// 作业者Id
     /// </summary>
-    public List<ProcessWorkerDto> Workers { get; set; }
-
+    public long[] WorkerIds { get; set; }
 
     /// <summary>
-    /// 不良项目
+    /// 不良项目Id
     /// </summary>
-    public List<ProcessNgItemDto>  NgItems { get; set; }
+    public long[] NgItemIds { get; set; }
 
 
     /// <summary>
@@ -89,50 +88,4 @@ public class ProcessDto
     /// </summary>
     public bool IsDelete { get; set; }
 
-}
-
-
-/// <summary>
-/// 工序作业者
-/// </summary>
-public class ProcessWorkerDto
-{
-    /// <summary>
-    /// 作业者用户Id
-    /// </summary>
-    public long UserId { get; set; }
-
-    /// <summary>
-    /// 账户
-    /// </summary>
-    public string Account { get; set; }
-
-
-    /// <summary>
-    /// 真实姓名
-    /// </summary>
-    public string RealName { get; set; }
-}
-
-
-/// <summary>
-/// 工序不良项目
-/// </summary>
-public class ProcessNgItemDto
-{
-    /// <summary>
-    /// 不良项目Id
-    /// </summary>
-    public long NgItemId { get; set; }
-
-    /// <summary>
-    /// 不良项目编号
-    /// </summary>
-    public string Code { get; set; }
-
-
-    /// <summary>
-    /// 不良项目名称
-    /// </summary>
-    public string Name { get; set; }
 }

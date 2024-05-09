@@ -28,7 +28,7 @@ public class ProcessOutput
     /// <summary>
     /// 单价
     /// </summary>
-    public decimal UnitPrice { get; set; }
+    public decimal? UnitPrice { get; set; }
 
 
     /// <summary>
