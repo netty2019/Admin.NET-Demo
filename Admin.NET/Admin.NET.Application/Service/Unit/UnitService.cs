@@ -29,7 +29,7 @@ public class UnitService : IDynamicApiController, ITransient
                 u.Name.Contains(input.SearchKey.Trim())
             )
             .WhereIF(!string.IsNullOrWhiteSpace(input.Name), u => u.Name.Contains(input.Name.Trim()))
-            .OrderBy(p=>p.Sort)
+            .OrderBy(p => p.Sort)
             .Select<UnitOutput>();
         return await query.OrderBuilder(input).ToPagedListAsync(input.Page, input.PageSize);
     }
@@ -43,6 +43,7 @@ public class UnitService : IDynamicApiController, ITransient
     [ApiDescriptionSettings(Name = "Add")]
     public async Task<long> Add(AddUnitInput input)
     {
+        await UniqueCheck(input.Name);
         var entity = input.Adapt<Unit>();
         var maxSort = _rep.AsQueryable().Max(p => p.Sort);
         entity.Sort = maxSort + 1;
@@ -60,7 +61,7 @@ public class UnitService : IDynamicApiController, ITransient
     public async Task Delete(DeleteUnitInput input)
     {
         var entity = await _rep.GetFirstAsync(u => u.Id == input.Id) ?? throw Oops.Oh(ErrorCodeEnum.D1002);
-       // await _rep.FakeDeleteAsync(entity);   //假删除
+        // await _rep.FakeDeleteAsync(entity);   //假删除
         await _rep.DeleteAsync(entity);   //真删除
     }
 
@@ -73,6 +74,7 @@ public class UnitService : IDynamicApiController, ITransient
     [ApiDescriptionSettings(Name = "Update")]
     public async Task Update(UpdateUnitInput input)
     {
+        await UniqueCheck(input.Name, input.Id);
         var entity = input.Adapt<Unit>();
         await _rep.AsUpdateable(entity).IgnoreColumns(ignoreAllNullColumns: true).ExecuteCommandAsync();
     }
@@ -98,7 +100,7 @@ public class UnitService : IDynamicApiController, ITransient
     [ApiDescriptionSettings(Name = "List")]
     public async Task<List<UnitOutput>> List([FromQuery] UnitInput input)
     {
-        return await _rep.AsQueryable().OrderBy(p=>p.Sort).Select<UnitOutput>().ToListAsync();
+        return await _rep.AsQueryable().OrderBy(p => p.Sort).Select<UnitOutput>().ToListAsync();
     }
 
 
@@ -115,7 +117,7 @@ public class UnitService : IDynamicApiController, ITransient
         var list = await _rep.AsQueryable().OrderBy(p => p.Sort).ToListAsync();
         if (oldIdx < 0 || oldIdx >= list.Count || newIdx < 0 || newIdx >= list.Count)
         {
-            Oops.Oh("排序的索引超出范围");
+            throw Oops.Oh("排序的索引超出范围");
         }
         var item = list[oldIdx];
         list.RemoveAt(oldIdx);
@@ -125,6 +127,15 @@ public class UnitService : IDynamicApiController, ITransient
             list[i].Sort = i;
         }
         await _rep.AsUpdateable(list).UpdateColumns(p => p.Sort).ExecuteCommandAsync();
+    }
+
+    private async Task UniqueCheck(string name, long? expectedId = null)
+    {
+        var entity = await _rep.AsQueryable().FirstAsync(p => p.Name == name);
+        if (entity != null && (entity.Id != expectedId))
+        {
+            throw Oops.Oh($"单位‘{name}’已存在");
+        }
     }
 }
 
