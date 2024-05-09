@@ -3,7 +3,7 @@ enum Api {
   AddUnit = '/api/unit/add',
   DeleteUnit = '/api/unit/delete',
   UpdateUnit = '/api/unit/update',
-  PageUnit = '/api/unit/page',
+  ListUnit = '/api/unit/list',
   DetailUnit = '/api/unit/detail',
   SortUnit = '/api/unit/sort',
 }
@@ -32,11 +32,11 @@ export const updateUnit = (params?: any) =>
 			data: params,
 		});
 
-// 分页查询单位
-export const pageUnit = (params?: any) => 
+// 单位列表
+export const listUnit = (params?: any) => 
 	request({
-			url: Api.PageUnit,
-			method: 'post',
+			url: Api.ListUnit,
+			method: 'get',
 			data: params,
 		});
 

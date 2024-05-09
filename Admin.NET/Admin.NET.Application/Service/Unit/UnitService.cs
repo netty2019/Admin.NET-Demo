@@ -98,7 +98,7 @@ public class UnitService : IDynamicApiController, ITransient
     [ApiDescriptionSettings(Name = "List")]
     public async Task<List<UnitOutput>> List([FromQuery] UnitInput input)
     {
-        return await _rep.AsQueryable().Select<UnitOutput>().ToListAsync();
+        return await _rep.AsQueryable().OrderBy(p=>p.Sort).Select<UnitOutput>().ToListAsync();
     }
 
 

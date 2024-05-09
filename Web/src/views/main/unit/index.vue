@@ -1,12 +1,12 @@
 ﻿<template>
   <div class="unit-container">
     <el-card shadow="hover" :body-style="{ paddingBottom: '0' }">
-      <el-form :model="queryParams" ref="queryForm" >
+      <el-form :model="queryParams" ref="queryForm">
         <el-row>
           <el-col :xs="24" :sm="12" :md="12" :lg="6" :xl="6" class="mb10">
             <el-form-item>
-                <el-button type="primary" style="margin-left:5px;" icon="ele-Plus" @click="openAddUnit"
-                  v-auth="'unit:add'"> 新增 </el-button>
+              <el-button type="primary" style="margin-left:5px;" icon="ele-Plus" @click="openAddUnit"
+                v-auth="'unit:add'"> 新增 </el-button>
             </el-form-item>
           </el-col>
         </el-row>
@@ -14,7 +14,7 @@
     </el-card>
     <el-card class="full-table" shadow="hover" style="margin-top: 5px">
       <VueDraggable target="tbody" v-model="tableData" :animation="150" handle=".sort-handle" @end="rowSortChange">
-        <el-table :data="tableData" style="width: 100%" v-loading="loading" tooltip-effect="light" row-key="id"
+        <el-table :data="tableData" style="width: 800px" v-loading="loading" tooltip-effect="light" row-key="id"
           @sort-change="sortChange" border="">
           <el-table-column label="排序" width="80" align="center">
             <template #default="scope">
@@ -40,10 +40,6 @@
           </el-table-column>
         </el-table>
       </VueDraggable>
-      <el-pagination v-model:currentPage="tableParams.page" v-model:page-size="tableParams.pageSize"
-        :total="tableParams.total" :page-sizes="[10, 20, 50, 100, 200, 500]" small="" background=""
-        @size-change="handleSizeChange" @current-change="handleCurrentChange"
-        layout="total, sizes, prev, pager, next, jumper" />
       <printDialog ref="printDialogRef" :title="printUnitTitle" @reloadTable="handleQuery" />
       <editDialog ref="editDialogRef" :title="editUnitTitle" @reloadTable="handleQuery" />
     </el-card>
@@ -60,7 +56,7 @@ import { formatDate } from '/@/utils/formatTime';
 
 import printDialog from '/@/views/system/print/component/hiprint/preview.vue'
 import editDialog from '/@/views/main/unit/component/editDialog.vue'
-import { pageUnit, deleteUnit, sortUnit } from '/@/api/main/unit';
+import { listUnit, deleteUnit, sortUnit } from '/@/api/main/unit';
 
 import { VueDraggable } from 'vue-draggable-plus'
 
@@ -70,11 +66,6 @@ const editDialogRef = ref();
 const loading = ref(false);
 const tableData = ref<any>([]);
 const queryParams = ref<any>({});
-const tableParams = ref({
-  page: 1,
-  pageSize: 10,
-  total: 0,
-});
 
 const printUnitTitle = ref("");
 const editUnitTitle = ref("");
@@ -84,13 +75,11 @@ const changeAdvanceQueryUI = () => {
   showAdvanceQueryUI.value = !showAdvanceQueryUI.value;
 }
 
-
 // 查询操作
 const handleQuery = async () => {
   loading.value = true;
-  var res = await pageUnit(Object.assign(queryParams.value, tableParams.value));
-  tableData.value = res.data.result?.items ?? [];
-  tableParams.value.total = res.data.result?.total;
+  var res = await listUnit(Object.assign(queryParams.value));
+  tableData.value = res.data.result ?? [];
   loading.value = false;
 };
 
@@ -133,17 +122,7 @@ const delUnit = (row: any) => {
     .catch(() => { });
 };
 
-// 改变页面容量
-const handleSizeChange = (val: number) => {
-  tableParams.value.pageSize = val;
-  handleQuery();
-};
 
-// 改变页码序号
-const handleCurrentChange = (val: number) => {
-  tableParams.value.page = val;
-  handleQuery();
-};
 
 //行排序事件
 const rowSortChange = async (e: any) => {
