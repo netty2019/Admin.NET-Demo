@@ -13,8 +13,11 @@ using System.Threading.Tasks;
 namespace Admin.NET.Application.Entity;
 
 [SugarTable("Unit", "单位")]
-public class Unit : EntityBase
+public class Unit : EntityTenant
 {
     [SugarColumn(ColumnName = "Name", ColumnDescription = "名称", Length = 32)]
     public string Name { get; set; }
+
+    [SugarColumn(ColumnName = "Sort", ColumnDescription = "排序")]
+    public int Sort { get; set; }
 }

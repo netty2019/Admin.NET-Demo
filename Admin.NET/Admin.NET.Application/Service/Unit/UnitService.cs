@@ -1,6 +1,7 @@
 ﻿using Admin.NET.Core.Service;
 using Admin.NET.Application.Entity;
 using Microsoft.AspNetCore.Http;
+using OfficeOpenXml.FormulaParsing.Excel.Functions.Text;
 namespace Admin.NET.Application;
 /// <summary>
 /// 单位服务
@@ -28,6 +29,7 @@ public class UnitService : IDynamicApiController, ITransient
                 u.Name.Contains(input.SearchKey.Trim())
             )
             .WhereIF(!string.IsNullOrWhiteSpace(input.Name), u => u.Name.Contains(input.Name.Trim()))
+            .OrderBy(p=>p.Sort)
             .Select<UnitOutput>();
         return await query.OrderBuilder(input).ToPagedListAsync(input.Page, input.PageSize);
     }
@@ -42,6 +44,8 @@ public class UnitService : IDynamicApiController, ITransient
     public async Task<long> Add(AddUnitInput input)
     {
         var entity = input.Adapt<Unit>();
+        var maxSort = _rep.AsQueryable().Max(p => p.Sort);
+        entity.Sort = maxSort + 1;
         await _rep.InsertAsync(entity);
         return entity.Id;
     }
@@ -97,5 +101,30 @@ public class UnitService : IDynamicApiController, ITransient
         return await _rep.AsQueryable().Select<UnitOutput>().ToListAsync();
     }
 
+
+    /// <summary>
+    /// 拖拽排序
+    /// </summary>
+    /// <param name="oldIdx"></param>
+    /// <param name="newIdx"></param>
+    /// <returns></returns>
+    [HttpGet]
+    [ApiDescriptionSettings(Name = "Sort")]
+    public async Task Sort([FromQuery] int oldIdx, [FromQuery] int newIdx)
+    {
+        var list = await _rep.AsQueryable().OrderBy(p => p.Sort).ToListAsync();
+        if (oldIdx < 0 || oldIdx >= list.Count || newIdx < 0 || newIdx >= list.Count)
+        {
+            Oops.Oh("排序的索引超出范围");
+        }
+        var item = list[oldIdx];
+        list.RemoveAt(oldIdx);
+        list.Insert(newIdx, item);
+        for (var i = 0; i < list.Count(); i++)
+        {
+            list[i].Sort = i;
+        }
+        await _rep.AsUpdateable(list).UpdateColumns(p => p.Sort).ExecuteCommandAsync();
+    }
 }
 

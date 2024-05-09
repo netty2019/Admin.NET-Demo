@@ -5,6 +5,7 @@ enum Api {
   UpdateUnit = '/api/unit/update',
   PageUnit = '/api/unit/page',
   DetailUnit = '/api/unit/detail',
+  SortUnit = '/api/unit/sort',
 }
 
 // 增加单位
@@ -45,6 +46,15 @@ export const detailUnit = (id: any) =>
 			url: Api.DetailUnit,
 			method: 'get',
 			data: { id },
+		});
+
+
+//拖拽排序
+export const sortUnit = (oldIdx: any, newIdx:any) => 
+	request({
+			url: Api.SortUnit,
+			method: 'get',
+			data: { oldIdx, newIdx},
 		});
 
 
