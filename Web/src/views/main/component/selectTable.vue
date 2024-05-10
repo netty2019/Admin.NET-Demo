@@ -10,7 +10,8 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, defineAsyncComponent, nextTick, watch } from "vue";
+import { ref, defineAsyncComponent, nextTick, watch,onMounted } from "vue";
+import { pageProcess } from '/@/api/main/process';
 // 引入组件
 const Table = defineAsyncComponent(() => import('/@/components/table/index.vue'));
 const TableSearch = defineAsyncComponent(() => import('/@/components/table/search.vue'));
@@ -25,7 +26,7 @@ const tableData = ref<any>({
     config: {
         isStripe: true, // 是否显示表格斑马纹
         isBorder: false, // 是否显示表格边框
-        isSerialNo: true, // 是否显示表格序号
+        isSerialNo: false, // 是否显示表格序号
         isSelection: true, // 是否勾选表格多选
         showSelection: true, //是否显示表格多选
         pageSize: 100, // 每页条数
@@ -63,32 +64,38 @@ const onSearch = (data: any) => {
 watch(
     () => props.type,
     (newValue, oldValue) => {
-        if (newValue == 'process') {
-            //工序
-            tableData.value.columns = [
-                { prop: 'code', minWidth: 150, label: '工序编号', headerAlign: 'center', sortable: 'code' },
-                { prop: 'name', minWidth: 150, label: '工序名称', headerAlign: 'center', sortable: 'name' },
-            ];
-        }
+        updateColumns();
     },
 );
 
+const updateColumns =()=>{
+    if (props.type == 'process') {
+            //工序
+            tableData.value.columns = [
+                { prop: 'code', minWidth: 150, label: '工序编号', headerAlign: 'center', sortable: 'code' ,isCheck: true},
+                { prop: 'name', minWidth: 150, label: '工序名称', headerAlign: 'center', sortable: 'name' ,isCheck: true},
+            ];
+        }
+};
 
 const getData = (param: any) => {
     if (props.type == 'process') {
         //工序
-        return [];
+        return pageProcess(param).then((res) => {
+            return res.data;
+        });
     }
-    return [];
 };
 
+
+onMounted(() => {
+    updateColumns();
+});
 
 </script>
 
 <style scoped>
-:deep(.el-ipnut),
-:deep(.el-select),
-:deep(.el-input-number) {
-    width: 100%;
+:deep(.table-header) {
+    display: none !important;
 }
 </style>

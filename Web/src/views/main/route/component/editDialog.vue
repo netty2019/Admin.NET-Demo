@@ -33,8 +33,14 @@
 					<div style="color: #b1b3b8">工序</div>
 				</el-divider>
 				<el-row>
-					<el-button icon="ele-Plus" type="primary" plain @click="ruleForm.processes.push({})"> 增加
-					</el-button>
+					<el-popover placement="right" :width="600" trigger="click">
+						<template #reference>
+							<el-button icon="ele-Plus" type="primary" plain> 增加
+							</el-button>
+						</template>
+						<selectTable :type="'process'"></selectTable>
+					</el-popover>
+
 				</el-row>
 				<VueDraggable target="tbody" v-model="ruleForm.processes" :animation="150" handle=".sort-handle"
 					style="margin-top: 10px;">
@@ -85,6 +91,7 @@ import { ElMessageBox, ElMessage } from "element-plus";
 import type { FormRules } from "element-plus";
 import { addRoute, updateRoute, detailRoute } from "/@/api/main/route";
 import { VueDraggable } from 'vue-draggable-plus'
+import selectTable from "/@/views/main/component/selectTable.vue";
 //父级传递来的参数
 var props = defineProps({
 	title: {
