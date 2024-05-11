@@ -5,7 +5,8 @@
 				<slot name="command"></slot>
 			</div>
 			<div v-loading="state.importLoading" class="table-footer-tool">
-				<SvgIcon v-if="!config.hideRefresh" name="iconfont icon-shuaxin" :size="22" title="刷新" @click="onRefreshTable" />
+				<SvgIcon v-if="!config.hideRefresh" name="iconfont icon-shuaxin" :size="22" title="刷新"
+					@click="onRefreshTable" />
 				<el-dropdown v-if="!config.hideExport" trigger="click">
 					<SvgIcon name="iconfont icon-yunxiazai_o" :size="22" title="导出" />
 					<template #dropdown>
@@ -15,8 +16,10 @@
 						</el-dropdown-menu>
 					</template>
 				</el-dropdown>
-				<SvgIcon v-if="!config.hidePrint" name="iconfont icon-dayin" :size="19" title="打印" @click="onPrintTable" />
-				<el-popover v-if="!config.hideSet" placement="bottom-end" trigger="click" transition="el-zoom-in-top" popper-class="table-tool-popper" :width="300" :persistent="false" @show="onSetTable">
+				<SvgIcon v-if="!config.hidePrint" name="iconfont icon-dayin" :size="19" title="打印"
+					@click="onPrintTable" />
+				<el-popover v-if="!config.hideSet" placement="bottom-end" trigger="click" transition="el-zoom-in-top"
+					popper-class="table-tool-popper" :width="300" :persistent="false" @show="onSetTable">
 					<template #reference>
 						<SvgIcon name="iconfont icon-quanjushezhi_o" :size="22" title="设置" />
 					</template>
@@ -25,15 +28,19 @@
 							<el-tooltip content="拖动进行排序" placement="top-start">
 								<SvgIcon name="fa fa-question-circle-o" :size="17" class="ml11" color="#909399" />
 							</el-tooltip>
-							<el-checkbox v-model="state.checkListAll" :indeterminate="state.checkListIndeterminate" class="ml10 mr1" label="列显示" @change="onCheckAllChange" />
+							<el-checkbox v-model="state.checkListAll" :indeterminate="state.checkListIndeterminate"
+								class="ml10 mr1" label="列显示" @change="onCheckAllChange" />
 							<el-checkbox v-model="getConfig.isSerialNo" class="ml12 mr1" label="序号" />
-							<el-checkbox v-if="getConfig.showSelection" v-model="getConfig.isSelection" class="ml12 mr1" label="多选" />
+							<el-checkbox v-if="getConfig.showSelection" v-model="getConfig.isSelection" class="ml12 mr1"
+								label="多选" />
 						</div>
 						<el-scrollbar>
 							<div ref="toolSetRef" class="tool-sortable">
-								<div class="tool-sortable-item" v-for="v in columns" :key="v.prop" v-show="!v.hideCheck && !v.fixed" :data-key="v.prop">
+								<div class="tool-sortable-item" v-for="v in columns" :key="v.prop"
+									v-show="!v.hideCheck && !v.fixed" :data-key="v.prop">
 									<i class="fa fa-arrows-alt handle cursor-pointer"></i>
-									<el-checkbox v-model="v.isCheck" size="default" class="ml12 mr8" :label="v.label" @change="onCheckChange" />
+									<el-checkbox v-model="v.isCheck" size="default" class="ml12 mr8" :label="v.label"
+										@change="onCheckChange" />
 								</div>
 							</div>
 						</el-scrollbar>
@@ -41,64 +48,51 @@
 				</el-popover>
 			</div>
 		</div>
-		<el-table
-			ref="tableRef"
-			:data="state.data"
-			:border="setBorder"
-			:stripe="setStripe"
-			v-bind="$attrs"
-			row-key="id"
-			default-expand-all
-			style="width: 100%"
-			v-loading="state.loading"
-			:default-sort="defaultSort"
-			@selection-change="onSelectionChange"
-			@sort-change="sortChange"
-		>
-			<el-table-column type="selection" :reserve-selection="true" :width="30" v-if="config.isSelection && config.showSelection" />
+		<el-table ref="tableRef" :data="state.data" :border="setBorder" :stripe="setStripe" v-bind="$attrs" row-key="id"
+			default-expand-all style="width: 100%" v-loading="state.loading" :default-sort="defaultSort"
+			@selection-change="onSelectionChange" @sort-change="sortChange"     @row-click="handleRowClick">
+			<el-table-column type="selection" :reserve-selection="true" :width="30"
+				v-if="config.isSelection && config.showSelection" fixed="left" />
 			<el-table-column type="index" label="序号" align="center" :width="60" v-if="config.isSerialNo" />
 			<el-table-column v-for="(item, index) in setHeader" :key="index" v-bind="item">
 				<!-- 自定义列插槽，插槽名为columns属性的prop -->
 				<template #default="scope" v-if="!item.children && $slots[item.prop]">
-					<formatter v-if="item.formatter" :fn="item.formatter(scope.row, scope.column, scope.cellValue, scope.index)"> </formatter>
+					<formatter v-if="item.formatter"
+						:fn="item.formatter(scope.row, scope.column, scope.cellValue, scope.index)"> </formatter>
 					<slot v-else :name="item.prop" v-bind="scope"></slot>
 				</template>
 				<template v-else-if="!item.children" v-slot="scope">
-					<formatter v-if="item.formatter" :fn="item.formatter(scope.row, scope.column, scope.cellValue, scope.index)"> </formatter>
+					<formatter v-if="item.formatter"
+						:fn="item.formatter(scope.row, scope.column, scope.cellValue, scope.index)"> </formatter>
 					<!-- <span v-if="item.formatter">{{ item.formatter(scope.row,scope.column,scope.cellValue,scope.index)  }}</span> -->
 					<template v-else-if="item.type === 'image'">
-						<el-image
-							:style="{ width: `${item.width}px`, height: `${item.height}px` }"
-							:src="scope.row[item.prop]"
-							:zoom-rate="1.2"
-							:preview-src-list="[scope.row[item.prop]]"
-							preview-teleported
-							fit="cover"
-						/>
+						<el-image :style="{ width: `${item.width}px`, height: `${item.height}px` }"
+							:src="scope.row[item.prop]" :zoom-rate="1.2" :preview-src-list="[scope.row[item.prop]]"
+							preview-teleported fit="cover" />
 					</template>
 					<template v-else>
 						{{ getProperty(scope.row, item.prop) }}
 					</template>
 				</template>
-				<el-table-column v-for="(childrenItem, childrenIndex) in item.children" :key="childrenIndex" v-bind="childrenItem">
+				<el-table-column v-for="(childrenItem, childrenIndex) in item.children" :key="childrenIndex"
+					v-bind="childrenItem">
 					<!-- 自定义列插槽，插槽名为columns属性的prop -->
 					<template #default="scope" v-if="$slots[childrenItem.prop]">
-						<formatter v-if="childrenItem.formatter" :fn="childrenItem.formatter(scope.row, scope.column, scope.cellValue, scope.index)"> </formatter>
+						<formatter v-if="childrenItem.formatter"
+							:fn="childrenItem.formatter(scope.row, scope.column, scope.cellValue, scope.index)">
+						</formatter>
 						<!-- <span v-if="childrenItem.formatter">{{ childrenItem.formatter(scope.row,scope.column,scope.cellValue,scope.index) }}</span> -->
 						<slot v-else :name="childrenItem.prop" v-bind="scope"></slot>
 					</template>
 					<template v-else v-slot="scope">
-						<formatter v-if="childrenItem.formatter" :fn="childrenItem.formatter(scope.row, scope.column, scope.cellValue, scope.index)"> </formatter>
+						<formatter v-if="childrenItem.formatter"
+							:fn="childrenItem.formatter(scope.row, scope.column, scope.cellValue, scope.index)">
+						</formatter>
 						<!-- <span v-if="childrenItem.formatter">{{ childrenItem.formatter(scope.row,scope.column,scope.cellValue,scope.index) }}</span> -->
 						<template v-else-if="childrenItem.type === 'image'">
-							<el-image
-								:style="{ width: `${childrenItem.width}px`, height: `${childrenItem.height}px` }"
-								:src="scope.row[childrenItem.prop]"
-								:zoom-rate="1.2"
-								:preview-src-list="[scope.row[childrenItem.prop]]"
-								preview-teleported
-								fit="cover"
-							/>
+							<el-image :style="{ width: `${childrenItem.width}px`, height: `${childrenItem.height}px` }"
+								:src="scope.row[childrenItem.prop]" :zoom-rate="1.2"
+								:preview-src-list="[scope.row[childrenItem.prop]]" preview-teleported fit="cover" />
 						</template>
 						<template v-else>
 							{{ getProperty(scope.row, childrenItem.prop) }}
@@ -111,18 +105,10 @@
 			</template>
 		</el-table>
 		<div v-if="!config.hidePagination && state.showPagination" class="table-footer mt15">
-			<el-pagination
-				v-model:current-page="state.page.page"
-				v-model:page-size="state.page.pageSize"
-				small
-				:pager-count="5"
-				:page-sizes="config.pageSizes"
-				:total="state.total"
-				layout="total, sizes, prev, pager, next, jumper"
-				background
-				@size-change="onHandleSizeChange"
-				@current-change="onHandleCurrentChange"
-			>
+			<el-pagination v-model:current-page="state.page.page" v-model:page-size="state.page.pageSize" small
+				:pager-count="5" :page-sizes="config.pageSizes" :total="state.total"
+				layout="total, sizes, prev, pager, next, jumper" background @size-change="onHandleSizeChange"
+				@current-change="onHandleCurrentChange" :teleported="false">
 			</el-pagination>
 		</div>
 	</div>
@@ -429,6 +415,22 @@ defineExpose({
 	getTableData,
 	setTableData,
 });
+
+//zhenhua.shen 2024.05.11
+// 点击某行控制复选框选中与否
+const handleRowClick = (row:any) => {
+  const selected = state.selectlist.some((item) => item.id === row.id)
+  if (!selected) {
+    state.selectlist.push(row)
+    tableRef.value.toggleRowSelection(row)
+  } else {
+    const finArr = state.selectlist.filter((item) => {
+      return item.id !== row.id
+    })
+    state.selectlist = finArr
+    tableRef.value.toggleRowSelection(row, false)
+  }
+}
 </script>
 
 <style scoped lang="scss">

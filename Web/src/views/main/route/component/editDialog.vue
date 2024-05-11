@@ -16,35 +16,24 @@
 						<el-form-item label="编号" prop="code">
 							<el-input v-model="ruleForm.code" placeholder="请输入编号" maxlength="32" show-word-limit
 								clearable />
-
 						</el-form-item>
-
 					</el-col>
 					<el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="12" class="mb20">
 						<el-form-item label="名称" prop="name">
 							<el-input v-model="ruleForm.name" placeholder="请输入名称" maxlength="80" show-word-limit
 								clearable />
-
 						</el-form-item>
-
 					</el-col>
 				</el-row>
 				<el-divider border-style="dashed" content-position="center">
 					<div style="color: #b1b3b8">工序</div>
 				</el-divider>
 				<el-row>
-					<el-popover placement="right" :width="600" trigger="click">
-						<template #reference>
-							<el-button icon="ele-Plus" type="primary" plain> 增加
-							</el-button>
-						</template>
-						<selectTable :type="'process'"></selectTable>
-					</el-popover>
-
+					<el-button icon="ele-Plus" type="primary" plain @click="showSelectTable">增加</el-button>
 				</el-row>
 				<VueDraggable target="tbody" v-model="ruleForm.processes" :animation="150" handle=".sort-handle"
 					style="margin-top: 10px;">
-					<el-table :data="ruleForm.processes" style="width: 100%">
+					<el-table :data="ruleForm.processes" style="width: 100%" height="300" >
 						<el-table-column label="排序" width="80" align="center">
 							<template #default="scope">
 								<div style="display: flex; justify-content: center;align-items: center"
@@ -76,6 +65,7 @@
 				</span>
 			</template>
 		</el-dialog>
+		<selectTable :title="'选择工序'" :type="'process'" @confirm="(e) => addProcess(e)" ref="selectTableRef"></selectTable>
 	</div>
 </template>
 <style scoped>
@@ -92,6 +82,7 @@ import type { FormRules } from "element-plus";
 import { addRoute, updateRoute, detailRoute } from "/@/api/main/route";
 import { VueDraggable } from 'vue-draggable-plus'
 import selectTable from "/@/views/main/component/selectTable.vue";
+import { AnyFn } from "@vueuse/core";
 //父级传递来的参数
 var props = defineProps({
 	title: {
@@ -104,6 +95,8 @@ const emit = defineEmits(["reloadTable"]);
 const ruleFormRef = ref();
 const isShowDialog = ref(false);
 const ruleForm = ref<any>({});
+
+
 //自行添加其他规则
 const rules = ref<FormRules>({
 	code: [{ required: true, message: '请输入编号！', trigger: 'blur', },],
@@ -152,6 +145,18 @@ const cancel = () => {
 	isShowDialog.value = false;
 };
 
+//显示工序选择对话框
+const selectTableRef = ref();
+const showSelectTable=()=>{
+	selectTableRef.value.show();
+};
+
+//增加工序
+const addProcess = (list: any) => {
+	console.log(list.value);
+};
+
+
 // 提交
 const submit = async () => {
 	ruleFormRef.value.validate(async (isValid: boolean, fields?: any) => {
@@ -173,14 +178,10 @@ const submit = async () => {
 };
 
 
-
-
-
-
-
 // 页面加载时
 onMounted(async () => {
 });
+
 
 //将属性或者函数暴露给父组件
 defineExpose({ openDialog });
